@@ -9,6 +9,9 @@ if [ $version == "8.0" ]; then
 elif [ $version == "7.8" ]; then
     echo "Raspian version is 7.8 Wheezy"
     webroot_dir="/var/www"
+else
+    echo "BH debian 8.6 Jessie"
+    webroot_dir="/var/www/html"
 fi
 
 # Outputs a RaspAP INSTALL log line
@@ -58,7 +61,8 @@ function enable_php_lighttpd() {
     install_log "Enabling PHP for lighttpd"
 
     sudo lighty-enable-mod fastcgi-php || install_error "Cannot enable fastcgi-php for lighttpd"
-    sudo /etc/init.d/lighttpd restart || install_error "Unable to restart lighttpd"
+    #    sudo /etc/init.d/lighttpd restart || install_error "Unable to restart lighttpd"
+    #    sudo systemctl restart lighttpd.service || install_error "Unable to restart lighttpd"
 }
 
 # Verifies existence and permissions of RaspAP directory
@@ -78,8 +82,9 @@ function download_latest_files() {
         sudo mv $webroot_dir /tmp/old_webroot || install_error "Unable to remove old webroot directory"
     fi
 
-    install_log "Cloning latest files from github"
-    git clone https://github.com/billz/raspap-webgui /tmp/raspap-webgui || install_error "Unable to download files from github"
+    #    install_log "Cloning latest files from github"
+    #    git clone https://github.com/billz/raspap-webgui /tmp/raspap-webgui || install_error "Unable to download files from github"
+    install_log "Move to web root"
     sudo mv /tmp/raspap-webgui $webroot_dir || install_error "Unable to move raspap-webgui to web root"
 }
 
@@ -100,7 +105,7 @@ function move_config_file() {
     fi
 
     install_log "Moving configuration file to '$raspap_dir'"
-    sudo mv "$webroot_dir"/raspap.php "$raspap_dir" || install_error "Unable to move files to '$raspap_dir'"
+    sudo mv "$webroot_dir"/{raspap.php,raspap.auth} "$raspap_dir" || install_error "Unable to move files to '$raspap_dir'"
     sudo chown -R $raspap_user:$raspap_user "$raspap_dir" || install_error "Unable to change file ownership for '$raspap_dir'"
 }
 
@@ -147,19 +152,19 @@ function patch_system_files() {
 function install_complete() {
     install_log "Installation completed!"
     
-    echo -n "The system needs to be rebooted as a final step. Reboot now? [y/N]: "
-    read answer
-    if [[ $answer != "y" ]]; then
-        echo "Installation aborted."
-        exit 0
-    fi
-    sudo shutdown -r now || install_error "Unable to execute shutdown"
+#    echo -n "The system needs to be rebooted as a final step. Reboot now? [y/N]: "
+#    read answer
+#    if [[ $answer != "y" ]]; then
+#        echo "Installation aborted."
+#        exit 0
+#    fi
+#    sudo shutdown -r now || install_error "Unable to execute shutdown"
 }
 
 function install_raspap() {
-    config_installation
-    update_system_packages
-    install_dependencies
+#    config_installation
+#    update_system_packages
+#    install_dependencies
     enable_php_lighttpd
     create_raspap_directories
     download_latest_files
@@ -169,3 +174,5 @@ function install_raspap() {
     patch_system_files
     install_complete
 }
+
+install_raspap
