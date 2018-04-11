@@ -9,8 +9,11 @@ if [ $version == "8.0" ]; then
 elif [ $version == "7.8" ]; then
     echo "Raspian version is 7.8 Wheezy"
     webroot_dir="/var/www"
-else
+elif [ $version == "8.6" ]; then
     echo "BH debian 8.6 Jessie"
+    webroot_dir="/var/www/html"
+else
+    echo "BH debian 9.4 Stretch"
     webroot_dir="/var/www/html"
 fi
 
